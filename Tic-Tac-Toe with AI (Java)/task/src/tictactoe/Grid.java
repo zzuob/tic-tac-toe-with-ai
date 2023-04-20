@@ -1,21 +1,8 @@
 package tictactoe;
 
-import java.util.Arrays;
 
 enum Symbol {
-    EMPTY("_"),
-    X("X"),
-    O("O");
-
-    private final String text;
-
-    Symbol(String text) {
-        this.text = text;
-    }
-
-    public String getText() {
-        return text;
-    }
+    EMPTY, X, O
 }
 public class Grid {
 
@@ -28,6 +15,26 @@ public class Grid {
 
     public Symbol[][] getSymbolArray() {
         return symbolArray;
+    }
+
+    public void printGrid() {
+        StringBuilder border = new StringBuilder();
+        for (int i = 0; i < Math.pow(getSIZE(), 2); i++) {
+            border.append("-");
+        }
+        System.out.println(border);
+        for (Symbol[] row: getSymbolArray()) {
+            System.out.print("| ");
+            for (Symbol cell: row) {
+                if ("EMPTY".equals(cell.name())) {
+                    System.out.print("  ");
+                } else {
+                    System.out.print(cell.name()+" ");
+                }
+            }
+            System.out.println("|");
+        }
+        System.out.println(border);
     }
 
 
@@ -53,7 +60,6 @@ public class Grid {
                 j++;
             }
         }
-        System.out.println(Arrays.deepToString(newSymbols));
         this.symbolArray = newSymbols;
     }
 }
