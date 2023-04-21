@@ -13,11 +13,12 @@ public class Main {
             if ("X".equals(player.name())) {
                 Turn.takeUserTurn(grid, Symbol.X);
             } else {
-                Turn.takeUserTurn(grid, Symbol.O);
+                Turn.takeComputerTurn(grid, Symbol.O, Turn.Difficulty.EASY);
             }
             state.updateStatus(grid);
-            System.out.println(state.getStatus().getMessage());
         }
         grid.printGrid();
+        System.out.println(state.getStatus().getMessage());
+
     }
 }
