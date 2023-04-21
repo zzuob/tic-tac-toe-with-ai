@@ -1,5 +1,6 @@
 package tictactoe;
 
+
 enum GameState {
     UNFINISHED("Game not finished"),
     DRAW("Draw"),
@@ -18,6 +19,22 @@ enum GameState {
 }
 public class State {
 
+    private GameState status;
+    private final int[][][] winConfigs;
+
+
+    public void updateStatus(Grid grid) {
+        this.status = checkState(grid);
+    }
+
+    public GameState getStatus() {
+        return status;
+    }
+
+    public State(Grid grid) {
+        this.winConfigs = getConfigs(grid);
+    }
+
     private static GameState checkWinner(Symbol winSymbol) {
         if ("X".equals(winSymbol.name())) {
             return GameState.X_WINS;
@@ -25,60 +42,35 @@ public class State {
             return GameState.O_WINS;
         }
     }
-    public static GameState checkState(Grid grid) {
-        Symbol[][] board = grid.getSymbolArray();
-        // horizontal checks
-        for (Symbol[] row : board) {
-            int count = 0;
-            Symbol winSymbol = row[0];
-            if ("EMPTY".equals(winSymbol.name())) {
-                continue;
-            }
-            for (Symbol cell : row) {
-                if (cell == winSymbol) {
-                    count++;
-                }
-            }
-            if (count == grid.getSIZE()) {
-                return checkWinner(winSymbol);
-            }
-        }
-        // vertical checks
+
+    public static int[][][] getConfigs (Grid grid) {
+        int winConditions = (grid.getSIZE() * 2) + 2; // all perpendicular and 2 diagonals
+        int[][][] winConfigs = new int[winConditions][3][2];
         for (int i = 0; i < grid.getSIZE(); i++) {
-            int count = 0;
-            Symbol winSymbol = board[0][i];
-            if ("EMPTY".equals(winSymbol.name())) {
-                continue;
-            }
-            for (int j = 0; j < grid.getSIZE(); j++) {
-                count += board[j][i] == winSymbol ? 1 : 0;
-            }
-            if (count == grid.getSIZE()) {
-                return checkWinner(winSymbol);
-            }
+            int[][] horizontal = new int[][]{{i,0}, {i,1}, {i,2}};
+            int[][] vertical = new int[][]{{0,i}, {1,i}, {2,i}};
+            winConfigs[i] = horizontal;
+            winConfigs[i+grid.getSIZE()] = vertical;
         }
-        // diagonal down (from 1,1)
-        Symbol winSymbol = board[0][0];
-        for (int i = 1; i < grid.getSIZE(); i++) {
-            if (winSymbol != board[i][i]) {
-                break;
-            } else if (i == grid.getSIZE() - 1) {
-                return checkWinner(winSymbol);
+        // add diagonals
+        winConfigs[grid.getSIZE()*2] = new int[][]{{0,0},{1,1},{2,2}};
+        winConfigs[grid.getSIZE()*2+1] = new int[][]{{2,0},{1,1},{0,2}};
+        return winConfigs;
+    }
+
+
+    public GameState checkState(Grid grid) {
+        Symbol[][] board = grid.getSymbolArray();
+        for (int[][] config: winConfigs) {
+            Symbol sym1 = board[config[0][0]][config[0][1]];
+            Symbol sym2 = board[config[1][0]][config[1][1]];
+            Symbol sym3 = board[config[2][0]][config[2][1]];
+            boolean isThreeInARow = sym1.name().equals(sym2.name()) && sym1.name().equals(sym3.name());
+            boolean isPlaced = !"EMPTY".equals(sym1.name());
+            if (isThreeInARow && isPlaced) {
+                return checkWinner(sym1);
             }
-            winSymbol = board[i][i];
-        }
-        // other diagonal
-        int y = grid.getSIZE() - 1;
-        Symbol previous = board[y][0];
-        System.out.printf("board[2][0] = %s\n", previous.name());
-        for (int i = 1; i < grid.getSIZE(); i++) {
-            System.out.printf("board[%d][%d] = %s\n", y-i, i, board[y-i][i].name());
-            if (previous != board[y-i][i]) {
-                break;
-            } else if (i == grid.getSIZE() - 1) {
-                return checkWinner(previous);
-            }
-            previous = board[y-i][i];
+
         }
         for (Symbol[] row : board) {
             for (Symbol cell : row) {
