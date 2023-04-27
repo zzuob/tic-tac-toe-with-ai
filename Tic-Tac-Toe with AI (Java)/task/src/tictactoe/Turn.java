@@ -9,22 +9,28 @@ public class Turn {
         EASY, MEDIUM, HARD
     }
 
+
     private static int[] checkTwoInARow(Grid grid, Symbol player) {
-        // check for two in a row
+        // check for two in a row, return
         Symbol[][] board = grid.getSymbolArray();
         int[][][] configs = State.getConfigs(grid);
         for (int[][] config: configs) {
             int[] sym1Coordinates = config[0];
             int[] sym2Coordinates = config[1];
             int[] sym3Coordinates = config[2];
-            boolean isSym1 = player == board[sym1Coordinates[0]][sym1Coordinates[1]];
-            boolean isSym2 = player == board[sym2Coordinates[0]][sym2Coordinates[1]];
-            boolean isSym3 = player == board[sym3Coordinates[0]][sym3Coordinates[1]];
-            if (isSym1 && isSym2) {
+            Symbol sym1 = board[sym1Coordinates[0]][sym1Coordinates[1]];
+            Symbol sym2 = board[sym2Coordinates[0]][sym2Coordinates[1]];
+            Symbol sym3 = board[sym3Coordinates[0]][sym3Coordinates[1]];
+            boolean isSym1 = player == sym1;
+            boolean isSym2 = player == sym2;
+            boolean isSym3 = player == sym3;
+            if (isSym1 && isSym2 && sym3 == Symbol.EMPTY) {
                 return sym3Coordinates;
-            } else if (isSym1 && isSym3) {
+            }
+            if (isSym1 && sym2 == Symbol.EMPTY && isSym3) {
                 return sym2Coordinates;
-            } else if (isSym2 && isSym3) {
+            }
+            if (sym1 == Symbol.EMPTY && isSym2 && isSym3) {
                 return sym1Coordinates;
             }
         }
@@ -41,9 +47,26 @@ public class Turn {
                 String coordinates = y + " " + x;
                 grid.validateMove(coordinates, player);
                 break;
-            } catch (Exception e) {
-                // do nothing - computer tries to place again
+            } catch (Exception ignored) {
             }
+        }
+    }
+
+    private static void takeMove(Grid grid, Symbol player, int[] move) throws IllegalArgumentException{
+        // int[] move = { (0 to 2), (0 to 2) }
+        int y = move[0] + 1;
+        int x = move[1] + 1;
+        String coordinates = y + " " + x;
+        grid.validateMove(coordinates, player);
+    }
+
+    private static Symbol otherPlayer(Symbol player) {
+        if (player == Symbol.EMPTY) {
+            throw new IllegalArgumentException("EMPTY is not a player");
+        } else if (player == Symbol.X) {
+            return Symbol.O;
+        } else {
+            return Symbol.X;
         }
     }
     public static void takeComputerTurn(Grid grid, Symbol player, Difficulty level) {
@@ -51,7 +74,20 @@ public class Turn {
         if ("EASY".equals(level.name())) {
             takeRandomMove(grid, player);
         } else if ("MEDIUM".equals(level.name())) {
-            takeRandomMove(grid, player);
+            int[] nextMove = checkTwoInARow(grid, player); // complete any 2-in-a-row the AI has
+            if (nextMove == null) {
+                nextMove = checkTwoInARow(grid, otherPlayer(player)); // move to block opponent from winning
+            }
+            if (nextMove == null) {
+                takeRandomMove(grid, player);
+            } else {
+                try {
+                    takeMove(grid, player, nextMove);
+                } catch (Exception e) {
+                    System.out.printf("Error: %s\nMaking a random move instead\n", e.getMessage());
+                    takeRandomMove(grid, player);
+                }
+            }
         }
     }
 
