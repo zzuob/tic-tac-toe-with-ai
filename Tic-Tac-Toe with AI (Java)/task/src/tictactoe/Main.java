@@ -21,7 +21,7 @@ public class Main {
                 String[] commands = command.split(" ");
                 if ("start".equals(commands[0]) && commands.length == 3) {
                     // check parameters for who will play
-                    String valid = "easy|user";
+                    String valid = "medium|easy|user";
                     if (commands[1].matches(valid) && commands[2].matches(valid)) {
                         playerX = commands[1];
                         playerO = commands[2];
@@ -57,6 +57,7 @@ public class Main {
                 switch (currentPlayer) {
                     case "user" -> Turn.takeUserTurn(grid, playerSymbol);
                     case "easy" -> Turn.takeComputerTurn(grid, playerSymbol, Turn.Difficulty.EASY);
+                    case "medium" -> Turn.takeComputerTurn(grid, playerSymbol, Turn.Difficulty.MEDIUM);
                 }
                 state.updateStatus(grid); // update the status of the game i.e. UNFINISHED, WIN etc.
             }
