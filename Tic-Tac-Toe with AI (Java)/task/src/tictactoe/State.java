@@ -36,7 +36,7 @@ public class State {
     }
 
     private static GameState checkWinner(Symbol winSymbol) {
-        if ("X".equals(winSymbol.name())) {
+        if (Symbol.X == winSymbol) {
             return GameState.X_WINS;
         } else {
             return GameState.O_WINS;
@@ -62,13 +62,14 @@ public class State {
     public GameState checkState(Grid grid) {
         Symbol[][] board = grid.getSymbolArray();
         for (int[][] config: winConfigs) {
+            // each win state comprises 3 symbols in specific positions
             Symbol sym1 = board[config[0][0]][config[0][1]];
             Symbol sym2 = board[config[1][0]][config[1][1]];
             Symbol sym3 = board[config[2][0]][config[2][1]];
-            boolean isThreeInARow = sym1.name().equals(sym2.name()) && sym1.name().equals(sym3.name());
-            boolean isPlaced = !"EMPTY".equals(sym1.name());
+            boolean isThreeInARow = sym1 == sym2 && sym1 == sym3;
+            boolean isPlaced = Symbol.EMPTY != sym1; // must be 3 Xs or 3 Os
             if (isThreeInARow && isPlaced) {
-                return checkWinner(sym1);
+                return checkWinner(sym1); // return the corresponding win state
             }
 
         }

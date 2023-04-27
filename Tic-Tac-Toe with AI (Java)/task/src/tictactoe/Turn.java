@@ -11,7 +11,7 @@ public class Turn {
 
 
     private static int[] checkTwoInARow(Grid grid, Symbol player) {
-        // check for two in a row, return
+        // check the grid for a two in a row in the specified player, return the missing move
         Symbol[][] board = grid.getSymbolArray();
         int[][][] configs = State.getConfigs(grid);
         for (int[][] config: configs) {
@@ -47,12 +47,12 @@ public class Turn {
                 String coordinates = y + " " + x;
                 grid.validateMove(coordinates, player);
                 break;
-            } catch (Exception ignored) {
+            } catch (Exception ignored) { // try to place again
             }
         }
     }
 
-    private static void takeMove(Grid grid, Symbol player, int[] move) throws IllegalArgumentException{
+    private static void takeMove(Grid grid, Symbol player, int[] move) throws IllegalArgumentException {
         // int[] move = { (0 to 2), (0 to 2) }
         int y = move[0] + 1;
         int x = move[1] + 1;
