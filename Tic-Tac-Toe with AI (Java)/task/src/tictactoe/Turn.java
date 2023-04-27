@@ -60,7 +60,7 @@ public class Turn {
         grid.validateMove(coordinates, player);
     }
 
-    private static Symbol otherPlayer(Symbol player) {
+    private static Symbol getOtherPlayer(Symbol player) {
         if (player == Symbol.EMPTY) {
             throw new IllegalArgumentException("EMPTY is not a player");
         } else if (player == Symbol.X) {
@@ -76,7 +76,7 @@ public class Turn {
         } else if ("MEDIUM".equals(level.name())) {
             int[] nextMove = checkTwoInARow(grid, player); // complete any 2-in-a-row the AI has
             if (nextMove == null) {
-                nextMove = checkTwoInARow(grid, otherPlayer(player)); // move to block opponent from winning
+                nextMove = checkTwoInARow(grid, getOtherPlayer(player)); // move to block opponent from winning
             }
             if (nextMove == null) {
                 takeRandomMove(grid, player);
